@@ -3,7 +3,7 @@
 
 ** Todo list: **
 
-- [ ] Multiple cursors
+- [ X ] Multiple cursors
 - [ ] Main menu animations
 - [ ] Main menu buttons (start, quit, settings)
 - [ ] Character selection screen with animations
