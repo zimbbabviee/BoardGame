@@ -1,9 +1,9 @@
 # BoardGame
 2.5 D Board game with multiple players and characters
 
-** Todo list: **
+**Todo list:**
 
-- [ X ] Multiple cursors
+- [X] Multiple cursors
 - [ ] Main menu animations
 - [ ] Main menu buttons (start, quit, settings)
 - [ ] Character selection screen with animations
