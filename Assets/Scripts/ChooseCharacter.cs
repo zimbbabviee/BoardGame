@@ -53,7 +53,7 @@ public class ChooseCharacterScript : MonoBehaviour
             PlayerPrefs.SetInt("SelectedCharacter", characterIndex);
             PlayerPrefs.SetString("PlayerName", characterName);
             PlayerPrefs.SetInt("PlayerCount", playerCount);
-            //StartCoroutine(sceneChanger.Delay("play"), characterIndex, characterName);
+            StartCoroutine(sceneChanger.Delay("play", characterIndex, characterName));
 
         }
         else
