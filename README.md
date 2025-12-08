@@ -6,7 +6,7 @@
 - [X] Multiple cursors
 - [ ] Main menu animations
 - [ ] Main menu buttons (start, quit, settings)
-- [ ] Character selection screen with animations
+- [X] Character selection screen with animations
 - [ ] Settings scene :)
 - [ ] Board scene with throwable dice
 - [ ] Game logic with multiple players :)
