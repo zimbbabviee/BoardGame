@@ -6,28 +6,112 @@ public class PlayerScript : MonoBehaviour
     public GameObject[] playerPrefabs;
     int characterIndex;
     public GameObject spawnPoint;
-    int[] otherPlayers;
     int index;
     private const string textFileName = "PlayersName";
 
     void Start()
     {
         characterIndex = PlayerPrefs.GetInt("SelectedCharacter", 0);
+
+        StartCoroutine(WaitForBoardAndSpawnPlayers());
+    }
+
+    System.Collections.IEnumerator WaitForBoardAndSpawnPlayers()
+    {
+        while (BoardManager.Instance == null)
+        {
+            yield return null;
+        }
+
+        while (TurnManager.Instance == null)
+        {
+            yield return null;
+        }
+
+        while (GameController.Instance == null)
+        {
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        BoardTile startTile = BoardManager.Instance.GetTile(1);
+        Vector3 startPosition = startTile != null ? startTile.GetPlayerPosition() : spawnPoint.transform.position;
+
         GameObject mainCharacter = Instantiate(playerPrefabs[characterIndex],
-            spawnPoint.transform.position, Quaternion.identity);
+            startPosition, Quaternion.identity);
         mainCharacter.GetComponent<NameScript>().SetName(PlayerPrefs.GetString("PlayerName", "Jagit Ler"));
-        otherPlayers = new int[PlayerPrefs.GetInt("PlayerCount")];
+
+        PlayerMovement playerMovement = mainCharacter.GetComponent<PlayerMovement>();
+        if (playerMovement == null)
+        {
+            playerMovement = mainCharacter.AddComponent<PlayerMovement>();
+        }
+
+        playerMovement.SetStartPosition();
+
+        if (TurnManager.Instance != null)
+        {
+            TurnManager.Instance.RegisterPlayer(playerMovement, false);
+            Debug.Log($"Главный игрок {playerMovement.name} зарегистрирован первым!");
+        }
+        else if (GameController.Instance != null)
+        {
+            GameController.Instance.SetCurrentPlayerWithoutAutoStart(playerMovement, false);
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
         string[] nameArray = ReadLinesFromFile(textFileName);
 
-        for (int i = 0; i < otherPlayers.Length - 1; i++)
+        int botCount = 3;
+
+        System.Collections.Generic.List<int> availableSkins = new System.Collections.Generic.List<int>();
+        for (int i = 0; i < playerPrefabs.Length; i++)
         {
-            spawnPoint.transform.position += new Vector3(0.2f, 0, 0.08f);
-            index = Random.Range(0, playerPrefabs.Length);
-            GameObject otherPlayer = Instantiate(playerPrefabs[index], spawnPoint.transform.position,
-                Quaternion.identity);
-            otherPlayer.GetComponent<NameScript>().
-                SetName(nameArray[Random.Range(0, nameArray.Length)]);
+            if (i != characterIndex)
+            {
+                availableSkins.Add(i);
+            }
         }
+
+        for (int botIndex = 0; botIndex < botCount; botIndex++)
+        {
+            int skinIndex;
+            if (availableSkins.Count > 0)
+            {
+                int randomIndex = Random.Range(0, availableSkins.Count);
+                skinIndex = availableSkins[randomIndex];
+                availableSkins.RemoveAt(randomIndex);
+            }
+            else
+            {
+                skinIndex = (characterIndex + botIndex + 1) % playerPrefabs.Length;
+            }
+
+            GameObject botPlayer = Instantiate(playerPrefabs[skinIndex],
+                startPosition, Quaternion.identity);
+
+            string botName = nameArray.Length > 0
+                ? nameArray[Random.Range(0, nameArray.Length)]
+                : $"Bot_{botIndex + 1}";
+            botPlayer.GetComponent<NameScript>().SetName(botName);
+
+            PlayerMovement botPlayerMovement = botPlayer.GetComponent<PlayerMovement>();
+            if (botPlayerMovement == null)
+            {
+                botPlayerMovement = botPlayer.AddComponent<PlayerMovement>();
+            }
+            botPlayerMovement.SetStartPosition();
+
+            if (TurnManager.Instance != null)
+            {
+                TurnManager.Instance.RegisterPlayer(botPlayerMovement, true); 
+                Debug.Log($"Бот {botPlayer.name} зарегистрирован! ({botIndex + 1}/{botCount})");
+            }
+        }
+
+        Debug.Log($"Всего создано {botCount} ботов");
     }
 
 

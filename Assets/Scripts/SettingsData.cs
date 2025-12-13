@@ -1,9 +1,7 @@
 using UnityEngine;
 using System;
 
-/// <summary>
-/// Класс для хранения и управления настройками игры
-/// </summary>
+
 [Serializable]
 public class SettingsData
 {
@@ -15,9 +13,6 @@ public class SettingsData
     public int qualityLevel = 2;
     public bool vSyncEnabled = true;
 
-    /// <summary>
-    /// Сохранить настройки в PlayerPrefs
-    /// </summary>
     public void Save()
     {
         PlayerPrefs.SetFloat("MusicVolume", musicVolume);
@@ -32,9 +27,6 @@ public class SettingsData
         Debug.Log("Настройки сохранены");
     }
 
-    /// <summary>
-    /// Загрузить настройки из PlayerPrefs
-    /// </summary>
     public void Load()
     {
         musicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.7f);
@@ -48,21 +40,14 @@ public class SettingsData
         Debug.Log("Настройки загружены");
     }
 
-    /// <summary>
-    /// Применить загруженные настройки
-    /// </summary>
     public void Apply()
     {
-        // Разрешение экрана
         Screen.SetResolution(resolutionWidth, resolutionHeight, isFullscreen);
 
-        // Качество графики
         QualitySettings.SetQualityLevel(qualityLevel);
 
-        // VSync
         QualitySettings.vSyncCount = vSyncEnabled ? 1 : 0;
 
-        // Громкость (применяется через AudioManager)
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.SetMusicVolume(musicVolume);
@@ -72,9 +57,6 @@ public class SettingsData
         Debug.Log($"Настройки применены: {resolutionWidth}x{resolutionHeight}, Качество: {qualityLevel}");
     }
 
-    /// <summary>
-    /// Сбросить настройки к значениям по умолчанию
-    /// </summary>
     public void ResetToDefaults()
     {
         musicVolume = 0.7f;
@@ -91,9 +73,6 @@ public class SettingsData
         Debug.Log("Настройки сброшены к значениям по умолчанию");
     }
 
-    /// <summary>
-    /// Сохранить настройки в JSON файл
-    /// </summary>
     public void SaveToJSON()
     {
         string json = JsonUtility.ToJson(this, true);
@@ -102,9 +81,6 @@ public class SettingsData
         Debug.Log($"Настройки сохранены в JSON: {path}");
     }
 
-    /// <summary>
-    /// Загрузить настройки из JSON файла
-    /// </summary>
     public void LoadFromJSON()
     {
         string path = Application.persistentDataPath + "/settings.json";

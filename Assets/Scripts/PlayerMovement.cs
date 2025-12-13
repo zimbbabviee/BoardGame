@@ -1,0 +1,131 @@
+using UnityEngine;
+using System.Collections;
+
+public class PlayerMovement : MonoBehaviour
+{
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float moveDelay = 0.5f; 
+    private int currentTileNumber = 1;
+    private bool isMoving = false;
+
+    private Vector3 playerOffset = Vector3.zero;
+    private static int playerCounter = 0;
+
+    private void Awake()
+    {
+        int playerIndex = playerCounter++;
+        float offsetRadius = 0.3f; 
+
+        float angle = playerIndex * (360f / 4) * Mathf.Deg2Rad; 
+        playerOffset = new Vector3(
+            Mathf.Cos(angle) * offsetRadius,
+            0.01f * playerIndex,
+            Mathf.Sin(angle) * offsetRadius
+        );
+    }
+
+    public void Move(int steps)
+    {
+        if (isMoving)
+        {
+            Debug.LogWarning("Игрок уже движется!");
+            return;
+        }
+
+        StartCoroutine(MoveCoroutine(steps));
+    }
+
+    private IEnumerator MoveCoroutine(int steps)
+    {
+        isMoving = true;
+
+        for (int i = 0; i < steps; i++)
+        {
+            currentTileNumber++;
+
+            if (currentTileNumber > BoardManager.Instance.GetTotalTiles())
+            {
+                currentTileNumber = BoardManager.Instance.GetTotalTiles();
+                break;
+            }
+
+            BoardTile targetTile = BoardManager.Instance.GetTile(currentTileNumber);
+            if (targetTile != null)
+            {
+                yield return StartCoroutine(MoveToTile(targetTile));
+            }
+
+            yield return new WaitForSeconds(moveDelay);
+        }
+
+        BoardTile landedTile = BoardManager.Instance.GetTile(currentTileNumber);
+        if (landedTile != null)
+        {
+            int extraMoves = landedTile.ProcessTileEffect();
+
+            if (extraMoves != 0)
+            {
+                yield return new WaitForSeconds(0.5f);
+                yield return StartCoroutine(MoveCoroutine(Mathf.Abs(extraMoves)));
+            }
+
+            if (landedTile.Type == TileType.Finish)
+            {
+                OnReachFinish();
+            }
+        }
+
+        isMoving = false;
+
+        if (TurnManager.Instance != null)
+        {
+            TurnManager.Instance.OnPlayerTurnComplete();
+        }
+    }
+
+    private IEnumerator MoveToTile(BoardTile tile)
+    {
+        Vector3 targetPosition = tile.GetPlayerPosition() + playerOffset;
+        float distance = Vector3.Distance(transform.position, targetPosition);
+        float duration = distance / moveSpeed;
+
+        float elapsed = 0f;
+        Vector3 startPosition = transform.position;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+            yield return null;
+        }
+
+        transform.position = targetPosition;
+    }
+
+    public void SetStartPosition()
+    {
+        currentTileNumber = 1;
+        BoardTile startTile = BoardManager.Instance.GetTile(1);
+        if (startTile != null)
+        {
+            transform.position = startTile.GetPlayerPosition() + playerOffset;
+        }
+    }
+
+    private void OnReachFinish()
+    {
+        Debug.Log($"Игрок {gameObject.name} достиг финиша!");
+    }
+
+    public int GetCurrentTileNumber()
+    {
+        return currentTileNumber;
+    }
+
+    public bool IsMoving()
+    {
+        return isMoving;
+    }
+}

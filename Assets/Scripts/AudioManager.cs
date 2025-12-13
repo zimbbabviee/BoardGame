@@ -80,8 +80,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    /// Воспроизвести звуковой эффект с пользовательской громкостью
-    /// </summary>
     public void PlaySFX(AudioClip clip, float volumeMultiplier)
     {
         if (sfxSource != null && clip != null)
@@ -92,8 +90,8 @@ public class AudioManager : MonoBehaviour
 
     private void LoadSettings()
     {
-        musicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.7f); // По умолчанию 70%
-        sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f); // По умолчанию 100%
+        musicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.7f); 
+        sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f); 
 
         if (musicSource != null)
         {

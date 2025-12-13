@@ -9,11 +9,19 @@ public class DiceRollScript : MonoBehaviour
     public string diceFaceNum;
     public bool isLanded = false;
     public bool firstThrow = false;
+    private Transform[] diceFaces;
 
 
     void Awake()
     {
         startPosition = transform.position;
+
+        diceFaces = new Transform[transform.childCount];
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            diceFaces[i] = transform.GetChild(i);
+        }
+
         Initialize();
     }
 
@@ -21,27 +29,82 @@ public class DiceRollScript : MonoBehaviour
     {
         rBody = GetComponent<Rigidbody>();
         rBody.isKinematic = true;
+        rBody.useGravity = false;
         position = transform.position;
-        transform.rotation = new Quaternion(
-            Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360), 0);
+        isLanded = true;
+
+        transform.rotation = Quaternion.Euler(
+            Random.Range(0f, 360f),
+            Random.Range(0f, 360f),
+            Random.Range(0f, 360f));
     }
 
-    private void RollDice()
+    public void RollDice()
     {
+        if (!firstThrow)
+        {
+            firstThrow = true;
+        }
+
+        isLanded = false;
+        diceFaceNum = "?";
         rBody.isKinematic = false;
+        rBody.useGravity = true;
+
+        float upForce = Random.Range(800, startRollingForce);
         forceX = Random.Range(0, maxRandForcVal);
         forceY = Random.Range(0, maxRandForcVal);
         forceZ = Random.Range(0, maxRandForcVal);
-        rBody.AddForce(Vector3.up * Random.Range(800, startRollingForce));
+
+        rBody.AddForce(Vector3.up * upForce);
         rBody.AddTorque(forceX, forceY, forceZ);
+
+        Debug.Log($"Кубик брошен! Сила: {upForce}, Вращение: ({forceX}, {forceY}, {forceZ}), Gravity: {rBody.useGravity}, Kinematic: {rBody.isKinematic}");
+    }
+
+    void FixedUpdate()
+    {
+        if (!isLanded && rBody != null && rBody.linearVelocity.magnitude < 0.1f && rBody.angularVelocity.magnitude < 0.1f)
+        {
+            Invoke(nameof(CheckDiceFace), 0.5f);
+        }
+    }
+
+    private void CheckDiceFace()
+    {
+        if (rBody.linearVelocity.magnitude < 0.1f && rBody.angularVelocity.magnitude < 0.1f)
+        {
+            isLanded = true;
+
+            float maxY = float.MinValue;
+            Transform topFace = null;
+
+            foreach (Transform face in diceFaces)
+            {
+                if (face.position.y > maxY)
+                {
+                    maxY = face.position.y;
+                    topFace = face;
+                }
+            }
+
+            if (topFace != null)
+            {
+                diceFaceNum = topFace.name;
+                Debug.Log($"Выпало число: {diceFaceNum}");
+            }
+        }
     }
 
     public void ResetDice()
     {
         transform.position = startPosition;
         firstThrow = false;
-        isLanded = false;
+        diceFaceNum = "?";
+        CancelInvoke(nameof(CheckDiceFace)); 
         Initialize();
+        isLanded = true;
+        Debug.Log("Кубик сброшен и готов к броску");
     }
 
 
@@ -49,9 +112,16 @@ public class DiceRollScript : MonoBehaviour
     {
         if (rBody != null)
         {
-            if (Input.GetMouseButtonDown(0) && isLanded ||
-                Input.GetMouseButtonDown(0) && !firstThrow)
+            bool canClick = isLanded || !firstThrow;
+
+            if (Input.GetMouseButtonDown(0) && canClick)
             {
+                if (GameController.Instance != null && GameController.Instance.IsCurrentPlayerBot())
+                {
+                    Debug.Log("Сейчас ход бота - ждите...");
+                    return;
+                }
+
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
 
@@ -63,9 +133,9 @@ public class DiceRollScript : MonoBehaviour
                         {
                             firstThrow = true;
                         }
+                        Debug.Log("Игрок кликнул на кубик!");
                         RollDice();
                     }
-
                 }
             }
         }

@@ -7,7 +7,6 @@ public class SoundEffectsScript : MonoBehaviour
 
     private void Start()
     {
-        // Синхронизация громкости с AudioManager
         if (AudioManager.Instance != null && audioSource != null)
         {
             audioSource.volume = AudioManager.Instance.GetSFXVolume();
@@ -31,7 +30,6 @@ public class SoundEffectsScript : MonoBehaviour
             audioSource.loop = true;
             audioSource.clip = soundEffect[2];
 
-            // Применить громкость из AudioManager
             if (AudioManager.Instance != null)
             {
                 audioSource.volume = AudioManager.Instance.GetSFXVolume();
@@ -56,21 +54,16 @@ public class SoundEffectsScript : MonoBehaviour
         PlaySound(soundEffect[5]);
     }
 
-    /// <summary>
-    /// Воспроизвести звук с учетом настроек громкости из AudioManager
-    /// </summary>
     private void PlaySound(AudioClip clip)
     {
         if (audioSource != null && clip != null)
         {
-            // Использовать AudioManager для воспроизведения с правильной громкостью
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlaySFX(clip);
             }
             else
             {
-                // Резервный вариант, если AudioManager не доступен
                 audioSource.PlayOneShot(clip);
             }
         }
