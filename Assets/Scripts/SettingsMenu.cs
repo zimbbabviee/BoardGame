@@ -4,16 +4,12 @@ using TMPro;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Управление меню настроек игры
-/// Функции: разрешение экрана, громкость музыки/звуковых эффектов, качество графики, VSync
-/// </summary>
 public class SettingsMenu : MonoBehaviour
 {
     [Header("UI Elements")]
     [SerializeField] private GameObject settingsPanel;
-    [SerializeField] private GameObject buttonsObject; // Объект с кнопками меню (Buttons)
-    [SerializeField] private GameObject headerObject; // Объект с Header (Ribbon и Medal)
+    [SerializeField] private GameObject buttonsObject; 
+    [SerializeField] private GameObject headerObject;
     [SerializeField] private Slider musicVolumeSlider;
     [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private TMP_Dropdown resolutionDropdown;
@@ -34,7 +30,6 @@ public class SettingsMenu : MonoBehaviour
         SetupQualityLevels();
         LoadSettings();
 
-        // Подписка на события изменения слайдеров
         if (musicVolumeSlider != null)
         {
             musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
@@ -61,9 +56,6 @@ public class SettingsMenu : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Настройка доступных разрешений экрана
-    /// </summary>
     private void SetupResolutions()
     {
         if (resolutionDropdown == null) return;
@@ -83,7 +75,6 @@ public class SettingsMenu : MonoBehaviour
             string option = resolutions[i].width + " x " + resolutions[i].height;
             options.Add(option);
 
-            // Найти текущее разрешение
             if (resolutions[i].width == Screen.width && resolutions[i].height == Screen.height)
             {
                 currentResolutionIndex = i;
@@ -95,9 +86,6 @@ public class SettingsMenu : MonoBehaviour
         resolutionDropdown.RefreshShownValue();
     }
 
-    /// <summary>
-    /// Настройка уровней качества графики
-    /// </summary>
     private void SetupQualityLevels()
     {
         if (qualityDropdown == null) return;
@@ -110,41 +98,32 @@ public class SettingsMenu : MonoBehaviour
         qualityDropdown.RefreshShownValue();
     }
 
-    /// <summary>
-    /// Загрузить сохраненные настройки
-    /// </summary>
     private void LoadSettings()
     {
-        // Громкость музыки
         if (musicVolumeSlider != null && AudioManager.Instance != null)
         {
             musicVolumeSlider.value = AudioManager.Instance.GetMusicVolume();
             UpdateMusicVolumeText(musicVolumeSlider.value);
         }
 
-        // Громкость звуковых эффектов
         if (sfxVolumeSlider != null && AudioManager.Instance != null)
         {
             sfxVolumeSlider.value = AudioManager.Instance.GetSFXVolume();
             UpdateSFXVolumeText(sfxVolumeSlider.value);
         }
 
-        // Полноэкранный режим
         if (fullscreenToggle != null)
         {
             fullscreenToggle.isOn = Screen.fullScreen;
         }
 
-        // VSync
         if (vsyncToggle != null)
         {
             vsyncToggle.isOn = QualitySettings.vSyncCount > 0;
         }
     }
 
-    /// <summary>
-    /// Обработчик изменения громкости музыки
-    /// </summary>
+
     private void OnMusicVolumeChanged(float value)
     {
         if (AudioManager.Instance != null)
@@ -153,16 +132,12 @@ public class SettingsMenu : MonoBehaviour
         }
         else
         {
-            // Сохранить напрямую, если AudioManager не доступен
             PlayerPrefs.SetFloat("MusicVolume", value);
-            AudioListener.volume = value; // Временное решение - меняет общую громкость
+            AudioListener.volume = value;
         }
         UpdateMusicVolumeText(value);
     }
 
-    /// <summary>
-    /// Обработчик изменения громкости звуковых эффектов
-    /// </summary>
     private void OnSFXVolumeChanged(float value)
     {
         if (AudioManager.Instance != null)
@@ -171,15 +146,11 @@ public class SettingsMenu : MonoBehaviour
         }
         else
         {
-            // Сохранить напрямую, если AudioManager не доступен
             PlayerPrefs.SetFloat("SFXVolume", value);
         }
         UpdateSFXVolumeText(value);
     }
 
-    /// <summary>
-    /// Обновить текст громкости музыки
-    /// </summary>
     private void UpdateMusicVolumeText(float value)
     {
         if (musicVolumeText != null)
@@ -188,9 +159,6 @@ public class SettingsMenu : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Обновить текст громкости звуковых эффектов
-    /// </summary>
     private void UpdateSFXVolumeText(float value)
     {
         if (sfxVolumeText != null)
@@ -199,9 +167,6 @@ public class SettingsMenu : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Обработчик изменения разрешения экрана
-    /// </summary>
     private void OnResolutionChanged(int resolutionIndex)
     {
         Resolution resolution = resolutions[resolutionIndex];
@@ -212,9 +177,6 @@ public class SettingsMenu : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    /// <summary>
-    /// Обработчик изменения качества графики
-    /// </summary>
     private void OnQualityChanged(int qualityIndex)
     {
         QualitySettings.SetQualityLevel(qualityIndex);
@@ -222,19 +184,12 @@ public class SettingsMenu : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    /// <summary>
-    /// Обработчик переключения полноэкранного режима
-    /// </summary>
     private void OnFullscreenToggled(bool isFullscreen)
     {
         Screen.fullScreen = isFullscreen;
         PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
         PlayerPrefs.Save();
     }
-
-    /// <summary>
-    /// Обработчик переключения вертикальной синхронизации
-    /// </summary>
     private void OnVSyncToggled(bool enabled)
     {
         QualitySettings.vSyncCount = enabled ? 1 : 0;
@@ -242,9 +197,6 @@ public class SettingsMenu : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    /// <summary>
-    /// Открыть меню настроек
-    /// </summary>
     public void OpenSettings()
     {
         if (settingsPanel != null)
@@ -252,22 +204,17 @@ public class SettingsMenu : MonoBehaviour
             settingsPanel.SetActive(true);
         }
 
-        // Скрыть кнопки меню
         if (buttonsObject != null)
         {
             buttonsObject.SetActive(false);
         }
 
-        // Скрыть Header (Ribbon и Medal)
         if (headerObject != null)
         {
             headerObject.SetActive(false);
         }
     }
 
-    /// <summary>
-    /// Закрыть меню настроек
-    /// </summary>
     public void CloseSettings()
     {
         if (settingsPanel != null)
@@ -275,25 +222,19 @@ public class SettingsMenu : MonoBehaviour
             settingsPanel.SetActive(false);
         }
 
-        // Показать кнопки меню обратно
         if (buttonsObject != null)
         {
             buttonsObject.SetActive(true);
         }
 
-        // Показать Header обратно
         if (headerObject != null)
         {
             headerObject.SetActive(true);
         }
     }
 
-    /// <summary>
-    /// Сбросить настройки к значениям по умолчанию
-    /// </summary>
     public void ResetToDefaults()
     {
-        // Громкость
         if (musicVolumeSlider != null)
         {
             musicVolumeSlider.value = 0.7f;
@@ -303,14 +244,12 @@ public class SettingsMenu : MonoBehaviour
             sfxVolumeSlider.value = 1f;
         }
 
-        // Разрешение (самое высокое)
         if (resolutionDropdown != null && resolutions != null && resolutions.Length > 0)
         {
             resolutionDropdown.value = resolutions.Length - 1;
             OnResolutionChanged(resolutions.Length - 1);
         }
 
-        // Качество (среднее)
         if (qualityDropdown != null)
         {
             int defaultQuality = QualitySettings.names.Length / 2;
@@ -318,13 +257,11 @@ public class SettingsMenu : MonoBehaviour
             OnQualityChanged(defaultQuality);
         }
 
-        // Полный экран
         if (fullscreenToggle != null)
         {
             fullscreenToggle.isOn = true;
         }
 
-        // VSync включен
         if (vsyncToggle != null)
         {
             vsyncToggle.isOn = true;
@@ -336,7 +273,6 @@ public class SettingsMenu : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Отписка от событий
         if (musicVolumeSlider != null)
         {
             musicVolumeSlider.onValueChanged.RemoveListener(OnMusicVolumeChanged);

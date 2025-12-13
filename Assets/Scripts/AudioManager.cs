@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Singleton класс для управления громкостью музыки и звуковых эффектов
-/// </summary>
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
@@ -19,7 +16,6 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton pattern
         if (Instance == null)
         {
             Instance = this;
@@ -34,7 +30,6 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        // Запускаем фоновую музыку
         if (musicSource != null && backgroundMusic != null)
         {
             musicSource.clip = backgroundMusic;
@@ -44,9 +39,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Установить громкость музыки (0-1)
-    /// </summary>
     public void SetMusicVolume(float volume)
     {
         musicVolume = Mathf.Clamp01(volume);
@@ -58,9 +50,7 @@ public class AudioManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    /// <summary>
-    /// Установить громкость звуковых эффектов (0-1)
-    /// </summary>
+
     public void SetSFXVolume(float volume)
     {
         sfxVolume = Mathf.Clamp01(volume);
@@ -72,25 +62,16 @@ public class AudioManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    /// <summary>
-    /// Получить текущую громкость музыки
-    /// </summary>
     public float GetMusicVolume()
     {
         return musicVolume;
     }
 
-    /// <summary>
-    /// Получить текущую громкость звуковых эффектов
-    /// </summary>
     public float GetSFXVolume()
     {
         return sfxVolume;
     }
 
-    /// <summary>
-    /// Воспроизвести звуковой эффект
-    /// </summary>
     public void PlaySFX(AudioClip clip)
     {
         if (sfxSource != null && clip != null)
@@ -99,7 +80,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Воспроизвести звуковой эффект с пользовательской громкостью
     /// </summary>
     public void PlaySFX(AudioClip clip, float volumeMultiplier)
@@ -110,9 +90,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Загрузить сохраненные настройки
-    /// </summary>
     private void LoadSettings()
     {
         musicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.7f); // По умолчанию 70%
@@ -128,9 +105,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Включить/выключить музыку
-    /// </summary>
     public void ToggleMusic(bool enabled)
     {
         if (musicSource != null)
@@ -146,9 +120,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Сменить фоновую музыку
-    /// </summary>
     public void ChangeBackgroundMusic(AudioClip newMusic)
     {
         if (musicSource != null && newMusic != null)
