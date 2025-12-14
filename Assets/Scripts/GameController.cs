@@ -34,6 +34,11 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
+        if (gameInfoUI == null)
+        {
+            gameInfoUI = FindObjectOfType<GameInfoUI>();
+        }
+
         if (currentPlayer != null)
         {
             currentPlayer.SetStartPosition();
@@ -84,12 +89,8 @@ public class GameController : MonoBehaviour
 
         if (currentPlayer != null && !currentPlayer.IsMoving())
         {
+            currentPlayer.AddMove();
             currentPlayer.Move(number);
-
-            if (gameInfoUI != null)
-            {
-                gameInfoUI.AddMove();
-            }
         }
 
         Invoke(nameof(ResetForNextRoll), 2f);

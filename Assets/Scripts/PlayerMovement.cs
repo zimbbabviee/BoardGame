@@ -5,9 +5,11 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float moveDelay = 0.5f; 
+    [SerializeField] private float moveDelay = 0.5f;
     private int currentTileNumber = 1;
     private bool isMoving = false;
+    private int totalMoves = 0;
+    private bool hasFinished = false;
 
     private Vector3 playerOffset = Vector3.zero;
     private static int playerCounter = 0;
@@ -175,6 +177,25 @@ public class PlayerMovement : MonoBehaviour
     private void OnReachFinish()
     {
         Debug.Log($"Игрок {gameObject.name} достиг финиша!");
+
+        hasFinished = true;
+
+        bool isBot = GameController.Instance != null && GameController.Instance.IsCurrentPlayerBot();
+
+        if (!isBot && WinScreenUI.Instance != null)
+        {
+            string playerName = gameObject.name;
+            NameScript nameScript = GetComponent<NameScript>();
+            if (nameScript != null)
+            {
+                playerName = nameScript.GetName();
+            }
+
+            GameInfoUI gameInfoUI = FindObjectOfType<GameInfoUI>();
+            float gameTime = gameInfoUI != null ? gameInfoUI.GetGameTime() : 0f;
+
+            WinScreenUI.Instance.ShowWinScreen(playerName, gameTime, totalMoves);
+        }
     }
 
     public int GetCurrentTileNumber()
@@ -185,5 +206,20 @@ public class PlayerMovement : MonoBehaviour
     public bool IsMoving()
     {
         return isMoving;
+    }
+
+    public void AddMove()
+    {
+        totalMoves++;
+    }
+
+    public int GetTotalMoves()
+    {
+        return totalMoves;
+    }
+
+    public bool HasFinished()
+    {
+        return hasFinished;
     }
 }

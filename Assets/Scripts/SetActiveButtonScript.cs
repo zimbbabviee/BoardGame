@@ -13,7 +13,16 @@ public class SetActiveButtonScript : MonoBehaviour
     private IEnumerator ToggleActiveCoroutine(float delay)
     {
         yield return new WaitForSeconds(delay);
-        targetObject.SetActive(!targetObject.activeSelf);
+
+        if (targetObject != null)
+        {
+            targetObject.SetActive(!targetObject.activeSelf);
+        }
+        else
+        {
+            Debug.LogWarning("SetActiveButtonScript: targetObject is not assigned!");
+        }
+
         gameObject.SetActive(!gameObject.activeSelf);
     }
 }

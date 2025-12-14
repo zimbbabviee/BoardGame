@@ -84,6 +84,12 @@ public class PauseManager : MonoBehaviour
             Debug.Log("gameUIElements скрыт");
         }
 
+        GameInfoUI gameInfoUI = FindObjectOfType<GameInfoUI>();
+        if (gameInfoUI != null)
+        {
+            gameInfoUI.Hide();
+        }
+
         ShowPanel(pausePanelCanvasGroup);
         Debug.Log($"Панель паузы показана. Alpha: {pausePanelCanvasGroup?.alpha}");
 
@@ -105,6 +111,12 @@ public class PauseManager : MonoBehaviour
         if (gameUIElements != null)
         {
             gameUIElements.SetActive(true);
+        }
+
+        GameInfoUI gameInfoUI = FindObjectOfType<GameInfoUI>();
+        if (gameInfoUI != null)
+        {
+            gameInfoUI.Show();
         }
     }
 

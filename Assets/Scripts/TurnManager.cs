@@ -72,7 +72,23 @@ public class TurnManager : MonoBehaviour
 
     private void SwitchToNextPlayer()
     {
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.Count;
+        int startIndex = currentPlayerIndex;
+        int attempts = 0;
+
+        do
+        {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.Count;
+            attempts++;
+
+            if (attempts > players.Count)
+            {
+                Debug.Log("All players have finished!");
+                waitingForTurnSwitch = false;
+                return;
+            }
+        }
+        while (players[currentPlayerIndex].HasFinished());
+
         PlayerMovement nextPlayer = players[currentPlayerIndex];
         bool isBot = playerIsBot[currentPlayerIndex];
 

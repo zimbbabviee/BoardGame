@@ -12,6 +12,12 @@ public class GameInfoUI : MonoBehaviour
     private int totalMoves = 0;
     private bool isGameRunning = true;
 
+    private void Start()
+    {
+        UpdateTimeDisplay();
+        UpdateMovesDisplay();
+    }
+
     private void Update()
     {
         if (isGameRunning && Time.timeScale > 0)
@@ -21,6 +27,7 @@ public class GameInfoUI : MonoBehaviour
         }
 
         UpdateCurrentTurnDisplay();
+        UpdateMovesDisplay();
     }
 
     private void UpdateCurrentTurnDisplay()
@@ -68,13 +75,25 @@ public class GameInfoUI : MonoBehaviour
     public void AddMove()
     {
         totalMoves++;
+        Debug.Log($"AddMove called! Total moves: {totalMoves}");
         UpdateMovesDisplay();
     }
 
     private void UpdateMovesDisplay()
     {
         if (movesText == null) return;
-        movesText.text = $"Moves: {totalMoves}";
+
+        if (TurnManager.Instance != null)
+        {
+            PlayerMovement currentPlayer = TurnManager.Instance.GetCurrentPlayer();
+            if (currentPlayer != null)
+            {
+                movesText.text = $"Moves: {currentPlayer.GetTotalMoves()}";
+                return;
+            }
+        }
+
+        movesText.text = "Moves: 0";
     }
 
     public void StopTimer()
@@ -99,5 +118,19 @@ public class GameInfoUI : MonoBehaviour
     public float GetGameTime()
     {
         return gameTime;
+    }
+
+    public void Hide()
+    {
+        if (currentTurnText != null) currentTurnText.gameObject.SetActive(false);
+        if (timeText != null) timeText.gameObject.SetActive(false);
+        if (movesText != null) movesText.gameObject.SetActive(false);
+    }
+
+    public void Show()
+    {
+        if (currentTurnText != null) currentTurnText.gameObject.SetActive(true);
+        if (timeText != null) timeText.gameObject.SetActive(true);
+        if (movesText != null) movesText.gameObject.SetActive(true);
     }
 }
