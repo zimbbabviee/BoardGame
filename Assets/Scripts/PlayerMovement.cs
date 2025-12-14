@@ -15,13 +15,22 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         int playerIndex = playerCounter++;
-        float offsetRadius = 0.3f; 
 
-        float angle = playerIndex * (360f / 4) * Mathf.Deg2Rad; 
-        playerOffset = new Vector3(
-            Mathf.Cos(angle) * offsetRadius,
-            0.01f * playerIndex,
-            Mathf.Sin(angle) * offsetRadius
+        float offset = 0.25f;
+        Vector3[] positions = new Vector3[]
+        {
+            new Vector3(-offset, 0f, -offset), 
+            new Vector3(offset, 0f, -offset),  
+            new Vector3(-offset, 0f, offset), 
+            new Vector3(offset, 0f, offset)   
+        };
+
+        playerOffset = positions[playerIndex % positions.Length];
+        Vector3 scale = transform.localScale;
+        transform.localScale = new Vector3(
+            Mathf.Abs(scale.x) * 0.7f,
+            Mathf.Abs(scale.y) * 0.7f,
+            Mathf.Abs(scale.z) * 0.7f
         );
     }
 

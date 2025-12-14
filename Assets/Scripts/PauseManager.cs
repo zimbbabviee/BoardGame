@@ -92,8 +92,6 @@ public class PauseManager : MonoBehaviour
             pausePanel.transform.SetAsLastSibling();
             Debug.Log($"PausePanel активен: {pausePanel.activeSelf}");
         }
-
-        AudioListener.pause = true;
     }
 
     public void ResumeGame()
@@ -108,8 +106,6 @@ public class PauseManager : MonoBehaviour
         {
             gameUIElements.SetActive(true);
         }
-
-        AudioListener.pause = false;
     }
 
     public void OpenSettingsFromPause()
