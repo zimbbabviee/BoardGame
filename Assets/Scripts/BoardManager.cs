@@ -6,9 +6,10 @@ public class BoardManager : MonoBehaviour
     public static BoardManager Instance { get; private set; }
 
     [Header("Board Settings")]
-    [SerializeField] private GameObject tilePrefab; 
-    [SerializeField] private int totalTiles = 20; 
-    [SerializeField] private float tileSize = 1.0f; 
+    [SerializeField] private GameObject tilePrefab;
+    [SerializeField] private int totalTiles = 20;
+    [SerializeField] private float tileSize = 1.0f;
+    [SerializeField] private float tileSpacing = 0.1f;
 
     [Header("Board Layout")]
     [SerializeField] private int tilesPerRow = 7; 
@@ -47,8 +48,9 @@ public class BoardManager : MonoBehaviour
         }
 
         int totalRows = Mathf.CeilToInt((float)totalTiles / tilesPerRow);
-        float boardWidth = (tilesPerRow - 1) * tileSize;
-        float boardDepth = (totalRows - 1) * tileSize;
+        float totalTileSize = tileSize + tileSpacing;
+        float boardWidth = (tilesPerRow - 1) * totalTileSize;
+        float boardDepth = (totalRows - 1) * totalTileSize;
 
         Vector3 startPosition = transform.position - new Vector3(boardWidth / 2f, 0, -boardDepth / 2f);
 
@@ -88,18 +90,19 @@ public class BoardManager : MonoBehaviour
 
         reverseDirection = (currentRow % 2 != 0);
 
+        float totalTileSize = tileSize + tileSpacing;
         float x, z;
 
         if (reverseDirection)
         {
-            x = startPosition.x + (tilesPerRow - 1 - tileInRow) * tileSize;
+            x = startPosition.x + (tilesPerRow - 1 - tileInRow) * totalTileSize;
         }
         else
         {
-            x = startPosition.x + tileInRow * tileSize;
+            x = startPosition.x + tileInRow * totalTileSize;
         }
 
-        z = startPosition.z - currentRow * tileSize;
+        z = startPosition.z - currentRow * totalTileSize;
 
         return new Vector3(x, startPosition.y, z);
     }
@@ -118,7 +121,7 @@ public class BoardManager : MonoBehaviour
                 tile.SetTileType(TileType.Jump, 2); 
                 break;
             case 7:
-                tile.SetTileType(TileType.Fall, -3); 
+                tile.SetTileType(TileType.Fall, -2);
                 break;
             case 11:
                 tile.SetTileType(TileType.Jump, 3); 

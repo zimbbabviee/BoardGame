@@ -6,6 +6,7 @@ public class GameController : MonoBehaviour
     [Header("References")]
     [SerializeField] private DiceRollScript diceScript;
     [SerializeField] private PlayerMovement currentPlayer;
+    [SerializeField] private GameInfoUI gameInfoUI;
 
     [Header("Bot Settings")]
     [SerializeField] private float botRollDelay = 2.5f; 
@@ -84,6 +85,11 @@ public class GameController : MonoBehaviour
         if (currentPlayer != null && !currentPlayer.IsMoving())
         {
             currentPlayer.Move(number);
+
+            if (gameInfoUI != null)
+            {
+                gameInfoUI.AddMove();
+            }
         }
 
         Invoke(nameof(ResetForNextRoll), 2f);

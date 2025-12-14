@@ -73,10 +73,15 @@ public class PlayerMovement : MonoBehaviour
         {
             int extraMoves = landedTile.ProcessTileEffect();
 
-            if (extraMoves != 0)
+            if (extraMoves > 0)
             {
                 yield return new WaitForSeconds(0.5f);
-                yield return StartCoroutine(MoveCoroutine(Mathf.Abs(extraMoves)));
+                yield return StartCoroutine(MoveForward(extraMoves));
+            }
+            else if (extraMoves < 0)
+            {
+                yield return new WaitForSeconds(0.5f);
+                yield return StartCoroutine(MoveBackward(Mathf.Abs(extraMoves)));
             }
 
             if (landedTile.Type == TileType.Finish)
@@ -90,6 +95,50 @@ public class PlayerMovement : MonoBehaviour
         if (TurnManager.Instance != null)
         {
             TurnManager.Instance.OnPlayerTurnComplete();
+        }
+    }
+
+    private IEnumerator MoveForward(int steps)
+    {
+        for (int i = 0; i < steps; i++)
+        {
+            currentTileNumber++;
+
+            if (currentTileNumber > BoardManager.Instance.GetTotalTiles())
+            {
+                currentTileNumber = BoardManager.Instance.GetTotalTiles();
+                break;
+            }
+
+            BoardTile targetTile = BoardManager.Instance.GetTile(currentTileNumber);
+            if (targetTile != null)
+            {
+                yield return StartCoroutine(MoveToTile(targetTile));
+            }
+
+            yield return new WaitForSeconds(moveDelay);
+        }
+    }
+
+    private IEnumerator MoveBackward(int steps)
+    {
+        for (int i = 0; i < steps; i++)
+        {
+            currentTileNumber--;
+
+            if (currentTileNumber < 1)
+            {
+                currentTileNumber = 1;
+                break;
+            }
+
+            BoardTile targetTile = BoardManager.Instance.GetTile(currentTileNumber);
+            if (targetTile != null)
+            {
+                yield return StartCoroutine(MoveToTile(targetTile));
+            }
+
+            yield return new WaitForSeconds(moveDelay);
         }
     }
 

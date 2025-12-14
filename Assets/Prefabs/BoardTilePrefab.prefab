@@ -124,7 +124,7 @@ MonoBehaviour:
   tileNumber: 0
   tileType: 0
   moveOffset: 0
-  normalMaterial: {fileID: 0}
-  jumpMaterial: {fileID: 0}
-  fallMaterial: {fileID: 0}
-  finishMaterial: {fileID: 0}
+  normalMaterial: {fileID: 2100000, guid: b2fcea6c7d9dbab4ca781825705d50be, type: 2}
+  jumpMaterial: {fileID: 2100000, guid: 6d8b3749ecc47d042893662591526797, type: 2}
+  fallMaterial: {fileID: 2100000, guid: 35a9557ce89506f4c98c2ab2890efd94, type: 2}
+  finishMaterial: {fileID: 2100000, guid: db6eb8ba3a54ba44fadade89158122d2, type: 2}

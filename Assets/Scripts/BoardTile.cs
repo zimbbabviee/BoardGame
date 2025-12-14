@@ -1,9 +1,10 @@
 using UnityEngine;
+using TMPro;
 
 public class BoardTile : MonoBehaviour
 {
     [Header("Tile Settings")]
-    [SerializeField] private int tileNumber; 
+    [SerializeField] private int tileNumber;
     [SerializeField] private TileType tileType = TileType.Normal;
 
     [Header("Special Tile Settings")]
@@ -13,10 +14,11 @@ public class BoardTile : MonoBehaviour
     [Header("Visual")]
     [SerializeField] private Material normalMaterial;
     [SerializeField] private Material jumpMaterial;
-    [SerializeField] private Material fallMaterial; 
-    [SerializeField] private Material finishMaterial; 
+    [SerializeField] private Material fallMaterial;
+    [SerializeField] private Material finishMaterial;
 
     private MeshRenderer meshRenderer;
+    private TextMeshPro stepText;
 
     public int TileNumber => tileNumber;
     public TileType Type => tileType;
@@ -25,7 +27,22 @@ public class BoardTile : MonoBehaviour
     private void Awake()
     {
         meshRenderer = GetComponent<MeshRenderer>();
+        CreateStepText();
         UpdateVisuals();
+    }
+
+    private void CreateStepText()
+    {
+        GameObject textObj = new GameObject("StepText");
+        textObj.transform.SetParent(transform);
+        textObj.transform.localPosition = new Vector3(0, 0.6f, 0);
+        textObj.transform.localRotation = Quaternion.Euler(90, 0, 0);
+
+        stepText = textObj.AddComponent<TextMeshPro>();
+        stepText.alignment = TextAlignmentOptions.Center;
+        stepText.fontSize = 1.5f;
+        stepText.fontStyle = FontStyles.Bold;
+        stepText.text = "";
     }
     public void SetTileNumber(int number)
     {
@@ -45,21 +62,80 @@ public class BoardTile : MonoBehaviour
         switch (tileType)
         {
             case TileType.Normal:
-                if (normalMaterial != null)
-                    meshRenderer.material = normalMaterial;
+                ApplyBorderedMaterial(Color.white);
+                UpdateStepText("");
                 break;
             case TileType.Jump:
                 if (jumpMaterial != null)
                     meshRenderer.material = jumpMaterial;
+                UpdateStepText($"+{moveOffset}", Color.black);
                 break;
             case TileType.Fall:
                 if (fallMaterial != null)
                     meshRenderer.material = fallMaterial;
+                UpdateStepText($"{moveOffset}", Color.black);
                 break;
             case TileType.Finish:
-                if (finishMaterial != null)
-                    meshRenderer.material = finishMaterial;
+                ApplyCheckerboardMaterial();
+                UpdateStepText("", Color.yellow);
                 break;
+        }
+    }
+
+    private void ApplyBorderedMaterial(Color fillColor)
+    {
+        int size = 32;
+        int borderWidth = 2;
+        Texture2D texture = new Texture2D(size, size);
+        texture.filterMode = FilterMode.Point;
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                bool isBorder = x < borderWidth || x >= size - borderWidth ||
+                               y < borderWidth || y >= size - borderWidth;
+                texture.SetPixel(x, y, isBorder ? Color.black : fillColor);
+            }
+        }
+        texture.Apply();
+
+        Material borderedMat = new Material(Shader.Find("Standard"));
+        borderedMat.mainTexture = texture;
+        meshRenderer.material = borderedMat;
+    }
+
+    private void ApplyCheckerboardMaterial()
+    {
+        int size = 8;
+        Texture2D texture = new Texture2D(size, size);
+        texture.filterMode = FilterMode.Point;
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                bool isWhite = (x + y) % 2 == 0;
+                texture.SetPixel(x, y, isWhite ? Color.white : Color.black);
+            }
+        }
+        texture.Apply();
+
+        Material checkerMat = new Material(Shader.Find("Standard"));
+        checkerMat.mainTexture = texture;
+        checkerMat.mainTextureScale = new Vector2(4, 4);
+        meshRenderer.material = checkerMat;
+    }
+
+    private void UpdateStepText(string text, Color? color = null)
+    {
+        if (stepText != null)
+        {
+            stepText.text = text;
+            if (color.HasValue)
+            {
+                stepText.color = color.Value;
+            }
         }
     }
     public int ProcessTileEffect()
