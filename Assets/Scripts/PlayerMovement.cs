@@ -10,9 +10,11 @@ public class PlayerMovement : MonoBehaviour
     private bool isMoving = false;
     private int totalMoves = 0;
     private bool hasFinished = false;
+    private int finishPlace = 0;
 
     private Vector3 playerOffset = Vector3.zero;
     private static int playerCounter = 0;
+    private static int finishPlaceCounter = 0;
 
     private void Awake()
     {
@@ -176,13 +178,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnReachFinish()
     {
-        Debug.Log($"Игрок {gameObject.name} достиг финиша!");
-
         hasFinished = true;
+        finishPlaceCounter++;
+        finishPlace = finishPlaceCounter;
+
+        Debug.Log($"Игрок {gameObject.name} достиг финиша! Место: {finishPlace}");
 
         bool isBot = GameController.Instance != null && GameController.Instance.IsCurrentPlayerBot();
 
-        if (!isBot && WinScreenUI.Instance != null)
+        if (!isBot)
         {
             string playerName = gameObject.name;
             NameScript nameScript = GetComponent<NameScript>();
@@ -194,8 +198,22 @@ public class PlayerMovement : MonoBehaviour
             GameInfoUI gameInfoUI = FindObjectOfType<GameInfoUI>();
             float gameTime = gameInfoUI != null ? gameInfoUI.GetGameTime() : 0f;
 
-            WinScreenUI.Instance.ShowWinScreen(playerName, gameTime, totalMoves);
+            WinScreenUI winScreen = WinScreenUI.Instance;
+            if (winScreen == null)
+            {
+                winScreen = FindObjectOfType<WinScreenUI>();
+            }
+
+            if (winScreen != null)
+            {
+                winScreen.ShowWinScreen(playerName, gameTime, totalMoves, finishPlace);
+            }
         }
+    }
+
+    public static void ResetFinishPlaceCounter()
+    {
+        finishPlaceCounter = 0;
     }
 
     public int GetCurrentTileNumber()

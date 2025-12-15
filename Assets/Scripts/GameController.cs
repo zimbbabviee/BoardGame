@@ -34,6 +34,8 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
+        PlayerMovement.ResetFinishPlaceCounter();
+
         if (gameInfoUI == null)
         {
             gameInfoUI = FindObjectOfType<GameInfoUI>();
@@ -154,6 +156,8 @@ public class GameController : MonoBehaviour
 
     public void RestartGame()
     {
+        PlayerMovement.ResetFinishPlaceCounter();
+
         if (currentPlayer != null)
         {
             currentPlayer.SetStartPosition();

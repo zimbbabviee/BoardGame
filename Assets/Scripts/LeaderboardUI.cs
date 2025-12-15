@@ -11,7 +11,6 @@ public class LeaderboardUI : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private GameObject leaderboardPanel;
     [SerializeField] private Transform entriesContainer;
-    [SerializeField] private GameObject entryPrefab;
     [SerializeField] private Button closeButton;
 
     [Header("Main Menu Elements (for SampleScene)")]
@@ -43,6 +42,43 @@ public class LeaderboardUI : MonoBehaviour
         if (closeButton != null)
         {
             closeButton.onClick.AddListener(Hide);
+        }
+
+        SetupEntriesContainer();
+    }
+
+    private void SetupEntriesContainer()
+    {
+        if (entriesContainer == null) return;
+
+        VerticalLayoutGroup layoutGroup = entriesContainer.GetComponent<VerticalLayoutGroup>();
+        if (layoutGroup == null)
+        {
+            layoutGroup = entriesContainer.gameObject.AddComponent<VerticalLayoutGroup>();
+        }
+
+        layoutGroup.childAlignment = TextAnchor.UpperLeft;
+        layoutGroup.childControlHeight = true;
+        layoutGroup.childControlWidth = true;
+        layoutGroup.childForceExpandHeight = false;
+        layoutGroup.childForceExpandWidth = true;
+        layoutGroup.spacing = 5f;
+        layoutGroup.padding = new RectOffset(10, 10, 10, 10);
+
+        ContentSizeFitter sizeFitter = entriesContainer.GetComponent<ContentSizeFitter>();
+        if (sizeFitter == null)
+        {
+            sizeFitter = entriesContainer.gameObject.AddComponent<ContentSizeFitter>();
+        }
+        sizeFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        RectTransform rectTransform = entriesContainer.GetComponent<RectTransform>();
+        if (rectTransform != null)
+        {
+            rectTransform.anchorMin = new Vector2(0, 1);
+            rectTransform.anchorMax = new Vector2(1, 1);
+            rectTransform.pivot = new Vector2(0.5f, 1);
         }
     }
 
@@ -82,18 +118,28 @@ public class LeaderboardUI : MonoBehaviour
         onHideCallback = callback;
     }
 
-    public void AddEntry(string playerName, float time, int moves)
+    public void AddEntry(string playerName, float time, int moves, int place)
     {
         List<LeaderboardEntry> entries = LoadLeaderboard();
+
+        int placePoints = CalculatePlacePoints(place);
+        int movesPoints = CalculateMovesPoints(moves);
+        int timePoints = CalculateTimePoints(time);
+        int totalScore = placePoints + movesPoints + timePoints;
 
         entries.Add(new LeaderboardEntry
         {
             playerName = playerName,
             time = time,
-            moves = moves
+            moves = moves,
+            place = place,
+            placePoints = placePoints,
+            movesPoints = movesPoints,
+            timePoints = timePoints,
+            totalScore = totalScore
         });
 
-        entries.Sort((a, b) => a.time.CompareTo(b.time));
+        entries.Sort((a, b) => b.totalScore.CompareTo(a.totalScore));
 
         if (entries.Count > maxEntries)
         {
@@ -101,6 +147,38 @@ public class LeaderboardUI : MonoBehaviour
         }
 
         SaveLeaderboard(entries);
+    }
+
+    public static int CalculateMovesPoints(int moves)
+    {
+        if (moves <= 3) return 10;
+        int points = 10 - (moves - 3);
+        return Mathf.Max(0, points);
+    }
+
+    public static int CalculatePlacePoints(int place)
+    {
+        switch (place)
+        {
+            case 1: return 3;
+            case 2: return 2;
+            case 3: return 1;
+            default: return 0;
+        }
+    }
+
+    public static int CalculateTimePoints(float time)
+    {
+        if (time <= 120f) return 3; 
+        float extraTime = time - 120f;
+        int penalty = Mathf.FloorToInt(extraTime / 30f);
+        int points = 3 - penalty;
+        return Mathf.Max(0, points);
+    }
+
+    public static int CalculateTotalScore(int moves, int place, float time)
+    {
+        return CalculateMovesPoints(moves) + CalculatePlacePoints(place) + CalculateTimePoints(time);
     }
 
     private void RefreshLeaderboard()
@@ -125,30 +203,61 @@ public class LeaderboardUI : MonoBehaviour
 
     private void CreateEntryUI(int rank, LeaderboardEntry entry)
     {
-        if (entryPrefab == null || entriesContainer == null) return;
+        if (entriesContainer == null) return;
 
-        GameObject entryObj = Instantiate(entryPrefab, entriesContainer);
+        GameObject entryObj = new GameObject($"Entry_{rank}");
+        entryObj.transform.SetParent(entriesContainer, false);
 
-        TextMeshProUGUI[] texts = entryObj.GetComponentsInChildren<TextMeshProUGUI>();
+        RectTransform rectTransform = entryObj.AddComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(0, 35f);
 
-        if (texts.Length >= 1)
+        LayoutElement layoutElement = entryObj.AddComponent<LayoutElement>();
+        layoutElement.minHeight = 35f;
+        layoutElement.preferredHeight = 35f;
+        layoutElement.flexibleWidth = 1f;
+
+        TextMeshProUGUI text = entryObj.AddComponent<TextMeshProUGUI>();
+        text.fontSize = 18f;
+        text.alignment = TextAlignmentOptions.Left;
+        text.color = Color.white;
+
+        int minutes = Mathf.FloorToInt(entry.time / 60f);
+        int seconds = Mathf.FloorToInt(entry.time % 60f);
+        string placeStr = GetPlaceString(entry.place);
+        text.text = $"{rank}. {entry.playerName} - {minutes:00}:{seconds:00} - {entry.moves} moves - {placeStr} - Score: {entry.totalScore}";
+    }
+
+    private string GetPlaceString(int place)
+    {
+        switch (place)
         {
-            int minutes = Mathf.FloorToInt(entry.time / 60f);
-            int seconds = Mathf.FloorToInt(entry.time % 60f);
-            texts[0].text = $"{rank}. {entry.playerName} - {minutes:00}:{seconds:00} - {entry.moves} moves";
+            case 1: return "1st";
+            case 2: return "2nd";
+            case 3: return "3rd";
+            default: return $"{place}th";
         }
     }
 
     private void CreateEmptyMessage()
     {
-        if (entryPrefab == null || entriesContainer == null) return;
+        if (entriesContainer == null) return;
 
-        GameObject entryObj = Instantiate(entryPrefab, entriesContainer);
-        TextMeshProUGUI text = entryObj.GetComponentInChildren<TextMeshProUGUI>();
-        if (text != null)
-        {
-            text.text = "No records yet!";
-        }
+        GameObject entryObj = new GameObject("EmptyMessage");
+        entryObj.transform.SetParent(entriesContainer, false);
+
+        RectTransform rectTransform = entryObj.AddComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(0, 35f);
+
+        LayoutElement layoutElement = entryObj.AddComponent<LayoutElement>();
+        layoutElement.minHeight = 35f;
+        layoutElement.preferredHeight = 35f;
+        layoutElement.flexibleWidth = 1f;
+
+        TextMeshProUGUI text = entryObj.AddComponent<TextMeshProUGUI>();
+        text.fontSize = 18f;
+        text.alignment = TextAlignmentOptions.Center;
+        text.color = Color.white;
+        text.text = "No records yet!";
     }
 
     private List<LeaderboardEntry> LoadLeaderboard()
@@ -191,6 +300,11 @@ public class LeaderboardEntry
     public string playerName;
     public float time;
     public int moves;
+    public int place;
+    public int placePoints;
+    public int movesPoints;
+    public int timePoints;
+    public int totalScore;
 }
 
 [System.Serializable]

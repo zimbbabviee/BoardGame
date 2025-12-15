@@ -63,6 +63,7 @@ public class PlayerScript : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         string[] nameArray = ReadLinesFromFile(textFileName);
+        string playerName = PlayerPrefs.GetString("PlayerName", "Player");
 
         int botCount = 3;
 
@@ -72,6 +73,15 @@ public class PlayerScript : MonoBehaviour
             if (i != characterIndex)
             {
                 availableSkins.Add(i);
+            }
+        }
+
+        System.Collections.Generic.List<string> availableNames = new System.Collections.Generic.List<string>();
+        foreach (string name in nameArray)
+        {
+            if (!name.Equals(playerName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                availableNames.Add(name);
             }
         }
 
@@ -92,9 +102,17 @@ public class PlayerScript : MonoBehaviour
             GameObject botPlayer = Instantiate(playerPrefabs[skinIndex],
                 startPosition, Quaternion.identity);
 
-            string botName = nameArray.Length > 0
-                ? nameArray[Random.Range(0, nameArray.Length)]
-                : $"Bot_{botIndex + 1}";
+            string botName;
+            if (availableNames.Count > 0)
+            {
+                int randomIndex = Random.Range(0, availableNames.Count);
+                botName = availableNames[randomIndex];
+                availableNames.RemoveAt(randomIndex);
+            }
+            else
+            {
+                botName = $"Bot_{botIndex + 1}";
+            }
             botPlayer.GetComponent<NameScript>().SetName(botName);
 
             PlayerMovement botPlayerMovement = botPlayer.GetComponent<PlayerMovement>();
@@ -106,7 +124,7 @@ public class PlayerScript : MonoBehaviour
 
             if (TurnManager.Instance != null)
             {
-                TurnManager.Instance.RegisterPlayer(botPlayerMovement, true); 
+                TurnManager.Instance.RegisterPlayer(botPlayerMovement, true);
                 Debug.Log($"Бот {botPlayer.name} зарегистрирован! ({botIndex + 1}/{botCount})");
             }
         }
