@@ -97,6 +97,11 @@ public class WinScreenUI : MonoBehaviour
         PlayerPrefs.SetFloat("LastTime", gameTime);
         PlayerPrefs.SetInt("LastMoves", totalMoves);
         PlayerPrefs.Save();
+
+        if (LeaderboardUI.Instance != null)
+        {
+            LeaderboardUI.Instance.AddEntry(playerName, gameTime, totalMoves);
+        }
     }
 
     private void OnRestartClicked()
@@ -113,8 +118,21 @@ public class WinScreenUI : MonoBehaviour
 
     private void OnLeaderboardClicked()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(leaderboardSceneName);
+        LeaderboardUI leaderboard = LeaderboardUI.Instance;
+
+        if (leaderboard == null)
+        {
+            leaderboard = FindObjectOfType<LeaderboardUI>();
+        }
+
+        if (leaderboard != null)
+        {
+            leaderboard.Show();
+        }
+        else
+        {
+            Debug.LogWarning("LeaderboardUI not found on scene!");
+        }
     }
 
     public void HideWinScreen()

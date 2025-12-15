@@ -233,6 +233,33 @@ public class SettingsMenu : MonoBehaviour
         }
     }
 
+    public void OpenLeaderboard()
+    {
+        LeaderboardUI leaderboard = LeaderboardUI.Instance;
+
+        if (leaderboard == null)
+        {
+            leaderboard = FindObjectOfType<LeaderboardUI>();
+        }
+
+        if (leaderboard != null)
+        {
+            if (buttonsObject != null)
+            {
+                buttonsObject.SetActive(false);
+            }
+            if (headerObject != null)
+            {
+                headerObject.SetActive(false);
+            }
+            leaderboard.Show();
+        }
+        else
+        {
+            Debug.LogWarning("LeaderboardUI not found on scene!");
+        }
+    }
+
     public void ResetToDefaults()
     {
         if (musicVolumeSlider != null)

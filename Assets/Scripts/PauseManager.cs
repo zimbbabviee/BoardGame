@@ -136,7 +136,21 @@ public class PauseManager : MonoBehaviour
 
     public void OpenLeaderboard()
     {
-        Debug.Log("Leaderboard opened from pause menu");
+        LeaderboardUI leaderboard = LeaderboardUI.Instance;
+
+        if (leaderboard == null)
+        {
+            leaderboard = FindObjectOfType<LeaderboardUI>();
+        }
+
+        if (leaderboard != null)
+        {
+            leaderboard.Show();
+        }
+        else
+        {
+            Debug.LogWarning("LeaderboardUI not found on scene!");
+        }
     }
 
     public void BackToMainMenu()
