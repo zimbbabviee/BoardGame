@@ -33,6 +33,6 @@ Spēles rezultāti tiek saglabāti rekordu tabulā, kurā tiek parādīts spēl�
 **Pauza:**
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/6683bf4d-8905-497d-8664-a088c2a5ab06" />
 
-***LeaderBoard:**
+**LeaderBoard:**
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/dd0122d6-b683-4924-a771-2fc990896919" />
 
