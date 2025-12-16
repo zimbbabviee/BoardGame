@@ -42,7 +42,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isMoving)
         {
-            Debug.LogWarning("Игрок уже движется!");
+            Debug.LogWarning("Player is already moving!");
             return;
         }
 
@@ -182,7 +182,7 @@ public class PlayerMovement : MonoBehaviour
         finishPlaceCounter++;
         finishPlace = finishPlaceCounter;
 
-        Debug.Log($"Игрок {gameObject.name} достиг финиша! Место: {finishPlace}");
+        Debug.Log($"Player {gameObject.name} reached the finish! Place: {finishPlace}");
 
         bool isBot = GameController.Instance != null && GameController.Instance.IsCurrentPlayerBot();
 

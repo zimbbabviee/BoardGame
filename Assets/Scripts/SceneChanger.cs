@@ -17,18 +17,18 @@ public class SceneChanger : MonoBehaviour
     {
         if (string.Equals(command, "quit", System.StringComparison.OrdinalIgnoreCase))
         {
-            yield return fadeScript.FadeOut(0.1f);
+            if (fadeScript != null)
+            {
+                yield return fadeScript.FadeOut(0.1f);
+            }
             PlayerPrefs.DeleteAll();
+            PlayerPrefs.Save();
 
-            if (UnityEditor.EditorApplication.isPlaying)
-            {
-                UnityEditor.EditorApplication.isPlaying = false;
-            }
-            else
-            {
-                Application.Quit();
-            }
-
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
         }
         else if (string.Equals(command, "play", System.StringComparison.OrdinalIgnoreCase))
         {

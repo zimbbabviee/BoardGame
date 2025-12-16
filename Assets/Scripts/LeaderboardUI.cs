@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 using System.Collections.Generic;
 using System;
@@ -80,6 +81,7 @@ public class LeaderboardUI : MonoBehaviour
             rectTransform.anchorMax = new Vector2(1, 1);
             rectTransform.pivot = new Vector2(0.5f, 1);
         }
+
     }
 
     public void Show()
@@ -209,17 +211,23 @@ public class LeaderboardUI : MonoBehaviour
         entryObj.transform.SetParent(entriesContainer, false);
 
         RectTransform rectTransform = entryObj.AddComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(0, 35f);
+        rectTransform.sizeDelta = new Vector2(0, 0);
 
         LayoutElement layoutElement = entryObj.AddComponent<LayoutElement>();
-        layoutElement.minHeight = 35f;
-        layoutElement.preferredHeight = 35f;
+        layoutElement.minHeight = 30f;
         layoutElement.flexibleWidth = 1f;
+        layoutElement.flexibleHeight = 0f;
 
         TextMeshProUGUI text = entryObj.AddComponent<TextMeshProUGUI>();
-        text.fontSize = 18f;
+        text.fontSize = 16f;
         text.alignment = TextAlignmentOptions.Left;
         text.color = Color.white;
+        text.enableWordWrapping = true;
+        text.overflowMode = TextOverflowModes.Overflow;
+
+        ContentSizeFitter textFitter = entryObj.AddComponent<ContentSizeFitter>();
+        textFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        textFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         int minutes = Mathf.FloorToInt(entry.time / 60f);
         int seconds = Mathf.FloorToInt(entry.time % 60f);
@@ -257,6 +265,7 @@ public class LeaderboardUI : MonoBehaviour
         text.fontSize = 18f;
         text.alignment = TextAlignmentOptions.Center;
         text.color = Color.white;
+        text.enableWordWrapping = true;
         text.text = "No records yet!";
     }
 

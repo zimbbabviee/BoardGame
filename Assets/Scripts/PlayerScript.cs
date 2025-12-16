@@ -53,7 +53,7 @@ public class PlayerScript : MonoBehaviour
         if (TurnManager.Instance != null)
         {
             TurnManager.Instance.RegisterPlayer(playerMovement, false);
-            Debug.Log($"Главный игрок {playerMovement.name} зарегистрирован первым!");
+            Debug.Log($"Main player {playerMovement.name} registered first!");
         }
         else if (GameController.Instance != null)
         {
@@ -125,11 +125,11 @@ public class PlayerScript : MonoBehaviour
             if (TurnManager.Instance != null)
             {
                 TurnManager.Instance.RegisterPlayer(botPlayerMovement, true);
-                Debug.Log($"Бот {botPlayer.name} зарегистрирован! ({botIndex + 1}/{botCount})");
+                Debug.Log($"Bot {botPlayer.name} registered! ({botIndex + 1}/{botCount})");
             }
         }
 
-        Debug.Log($"Всего создано {botCount} ботов");
+        Debug.Log($"Total {botCount} bots created");
     }
 
 

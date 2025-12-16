@@ -33,7 +33,7 @@ public class TurnManager : MonoBehaviour
         {
             players.Add(player);
             playerIsBot.Add(isBot);
-            Debug.Log($"Игрок {player.name} зарегистрирован (Bot: {isBot}). Всего игроков: {players.Count}");
+            Debug.Log($"Player {player.name} registered (Bot: {isBot}). Total players: {players.Count}");
 
             if (players.Count == 1 && GameController.Instance != null)
             {
@@ -56,13 +56,13 @@ public class TurnManager : MonoBehaviour
     {
         if (players.Count <= 1)
         {
-            Debug.Log("Только один игрок - смена хода не требуется");
+            Debug.Log("Only one player - no turn switch required");
             return;
         }
 
         if (waitingForTurnSwitch)
         {
-            Debug.LogWarning("Уже идет смена хода!");
+            Debug.LogWarning("Turn switch already in progress!");
             return;
         }
 
@@ -97,7 +97,7 @@ public class TurnManager : MonoBehaviour
             GameController.Instance.SwitchPlayer(nextPlayer, isBot);
         }
 
-        Debug.Log($"Ход перешел к: {nextPlayer.name} (игрок {currentPlayerIndex + 1}/{players.Count}, Bot: {isBot})");
+        Debug.Log($"Turn passed to: {nextPlayer.name} (player {currentPlayerIndex + 1}/{players.Count}, Bot: {isBot})");
         waitingForTurnSwitch = false;
     }
     
@@ -109,7 +109,7 @@ public class TurnManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Нажмите кубик для следующего хода");
+            Debug.Log("Click the dice for the next turn");
         }
     }
 }

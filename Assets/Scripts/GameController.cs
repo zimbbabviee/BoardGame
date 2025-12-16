@@ -46,7 +46,7 @@ public class GameController : MonoBehaviour
             currentPlayer.SetStartPosition();
         }
 
-        Debug.Log("Игра началась! Бросьте кубик чтобы сделать ход.");
+        Debug.Log("Game started! Roll the dice to make a move.");
     }
 
     private void Update()
@@ -78,7 +78,7 @@ public class GameController : MonoBehaviour
     {
         if (diceScript != null && waitingForDiceRoll && diceScript.isLanded)
         {
-            Debug.Log($"Бот {currentPlayer.name} бросает кубик...");
+            Debug.Log($"Bot {currentPlayer.name} is rolling the dice...");
             diceScript.RollDice();
         }
     }
@@ -87,7 +87,7 @@ public class GameController : MonoBehaviour
     {
         waitingForDiceRoll = false;
 
-        Debug.Log($"Выпало {number}! Перемещаем игрока...");
+        Debug.Log($"Rolled {number}! Moving player...");
 
         if (currentPlayer != null && !currentPlayer.IsMoving())
         {
@@ -102,7 +102,7 @@ public class GameController : MonoBehaviour
     {
         if (currentPlayer != null && currentPlayer.IsMoving())
         {
-            Debug.Log("Игрок еще движется, ждем завершения...");
+            Debug.Log("Player is still moving, waiting...");
             Invoke(nameof(ResetForNextRoll), 0.5f);
             return;
         }
@@ -114,14 +114,14 @@ public class GameController : MonoBehaviour
             diceScript.ResetDice();
         }
 
-        Debug.Log("Готов к следующему броску!");
+        Debug.Log("Ready for next roll!");
     }
 
       public void SetCurrentPlayerWithoutAutoStart(PlayerMovement player, bool isBot = false)
     {
         currentPlayer = player;
         isCurrentPlayerBot = isBot;
-        Debug.Log($"Current player set: {player.name} (Bot: {isBot}) - Ожидание первого хода");
+        Debug.Log($"Current player set: {player.name} (Bot: {isBot}) - Waiting for first turn");
     }
 
     public void SetCurrentPlayer(PlayerMovement player, bool isBot = false)
@@ -142,7 +142,7 @@ public class GameController : MonoBehaviour
         isCurrentPlayerBot = isBot;
         lastRolledNumber = 0;
 
-        Debug.Log($"Ход игрока: {newPlayer.name} (Bot: {isBot})");
+        Debug.Log($"Player turn: {newPlayer.name} (Bot: {isBot})");
 
         if (isBot)
         {
@@ -150,7 +150,7 @@ public class GameController : MonoBehaviour
         }
         else
         {
-            Debug.Log($"Ваш ход! Кликните на кубик чтобы бросить.");
+            Debug.Log($"Your turn! Click on the dice to roll.");
         }
     }
 
@@ -171,6 +171,6 @@ public class GameController : MonoBehaviour
         waitingForDiceRoll = true;
         lastRolledNumber = 0;
 
-        Debug.Log("Игра перезапущена!");
+        Debug.Log("Game restarted!");
     }
 }
